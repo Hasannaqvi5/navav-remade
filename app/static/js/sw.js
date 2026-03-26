@@ -11,8 +11,8 @@ self.addEventListener('push', function(event) {
     // 2. Configure the look and feel of the notification
     const options = {
       body: data.body,
-      icon: '/static/icons/icon-192x192.png',
-      badge: '/static/icons/badge-72x72.png',
+      icon: '/static/icon-192.png',
+      badge: '/static/icon-192.png',
       vibrate: [100, 50, 100],
       data: {
         url: data.url || '/' // Attach the URL for redirection on click
