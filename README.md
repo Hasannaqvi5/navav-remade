@@ -1,96 +1,66 @@
 # NavAv
 
-**Purpose-built attendance tracking for Canadian Naval Reserve units.**
+**Modern attendance tracking for organizational efficiency.**
 
-A modern replacement for NavAv (navav.net) with a military-flavoured UI, muster roll dashboard, invite-only registration, and per-unit Twilio SMS support.
+NavAv is a sleek, mobile-first PWA designed to replace legacy attendance systems with a modernized UI, real-time push notifications, and automated RSVP reminders.
+
+---
+
+## Features
+- **PWA Ready**: Installable on iOS and Android with a native-app feel.
+- **Instant Push Notifications**: Shift-change alerts and new event broadcasts via WebPush.
+- **Automated Reminders**: Smart 24-hour RSVP deadline alerts to keep engagement high.
+- **Admin Dashboard**: Manage members, track attendance, and export data with ease.
+- **Flexible Time Formats**: Toggle between 12-hour and 24-hour clocks per organization.
 
 ---
 
 ## Quick Start (Local Development)
 
-### Prerequisites
+### 1. Prerequisites
 - Python 3.10+
-- Docker Desktop (for PostgreSQL)
+- Database (SQLite for dev, PostgreSQL for prod)
 
-### 1. Clone / navigate to the project
-
-
-### 2. Start the database
-```powershell
-docker compose up -d
-```
-
-### 3. Create and activate a virtual environment
+### 2. Setup
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\activate
-```
-
-### 4. Install dependencies
-```powershell
 pip install -r requirements.txt
 ```
 
-### 5. Set up environment variables
-```powershell
-copy .env.example .env
-# Edit .env with your settings
-```
+### 3. Environment
+Copy `.env.example` to `.env` and configure your VAPID keys and database URL.
 
-### 6. Initialize the database
+### 4. Run
 ```powershell
-flask db init
-flask db migrate -m "Initial schema"
-flask db upgrade
+python run.py
 ```
-
-### 7. Run the app
-```powershell
-flask run
-```
-
-Open [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ---
 
 ## Project Structure
 
 ```
-navres-attendance/
+navav-remade/
 ├── app/
-│   ├── models/          # SQLAlchemy models
-│   ├── auth/            # Auth blueprint (login, register, password reset)
-│   ├── admin/           # Admin blueprint (events, muster roll, settings)
-│   ├── member/          # Member blueprint (dashboard, responses, profile)
-│   ├── main/            # Landing page
-│   ├── notifications/   # Email (Flask-Mail) and SMS (Twilio) helpers
-│   ├── static/          # CSS, JS, images
-│   └── templates/       # Jinja2 HTML templates
-├── config.py            # Dev/prod config classes
-├── run.py               # Entry point
-├── docker-compose.yml   # Local PostgreSQL
-├── Procfile             # Railway.app
+│   ├── models/          # Database schemas
+│   ├── auth/            # Login, Registration & Push Handshake
+│   ├── admin/           # Unit Management & Event Controls
+│   ├── member/          # User Dashboard & RSVP Logic
+│   ├── static/          # Modernized CSS & PWA Service Worker
+│   └── templates/       # Redesigned NavAv Templates
+├── config.py            # Global Application Settings
+├── run.py               # Entry Point
 └── requirements.txt
 ```
 
-## Deployment (Railway.app)
-
-1. Create a new Railway project and add a PostgreSQL plugin
-2. Set environment variables in Railway dashboard (copy from `.env.example`)
-3. Set `FLASK_ENV=production` and `DATABASE_URL` (Railway provides this automatically)
-4. Deploy — Railway uses the `Procfile` to start `gunicorn`
-
 ---
 
-## Build Order
-
-1. [x] Project scaffold + DB models
-2. [ ] User authentication (this is next)
-3. [ ] Unit creation and invite system
-4. [ ] Role-based views
-5. [ ] Event creation and responses
-6. [ ] Attendance tracking and muster roll
-7. [ ] Member profiles
-8. [ ] Attendance export (CSV)
-9. [ ] Email notifications
-10. [ ] SMS notifications (per-unit Twilio)
+## Development Status
+1. [x] Project rebranding and modernized UI
+2. [x] PWA Service Worker implementation
+3. [x] VAPID Push Notification system
+4. [x] Automated 24h RSVP deadline reminders
+5. [x] Multi-browser support (Chrome, Edge, Safari)
+6. [x] Admin dashboard and event management
+7. [x] Attendance tracking and CSV exports
