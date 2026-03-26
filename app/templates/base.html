@@ -205,6 +205,8 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
+      // Register the service worker at the root scope (/) so it can handle 
+      // push events for the entire project.
       navigator.serviceWorker.register("/sw.js")
         .then(function(registration) {
           window.swStatus = "Registered";
@@ -231,23 +233,30 @@
   }
 
   async function subscribeUser() {
+    /* 
+       Initiates the Web Push subscription flow.
+       1. Requests browser permission.
+       2. Retrieves the VAPID Public Key from the Flask server.
+       3. Creates a new Subscription endpoint.
+       4. Sends the subscription details (JSON) to /auth/subscribe_push.
+    */
     try {
       if (!window.isSecureContext) {
-        throw new Error('This browser requires a secure (HTTPS) connection to enable notifications. Try using Chrome or enabling HTTPS.');
+        throw new Error('This browser requires a secure (HTTPS) connection to enable notifications.');
       }
       if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      throw new Error('Push messaging is not supported in this browser.');
-    }
+        throw new Error('Push messaging is not supported in this browser.');
+      }
     
     const btn = document.getElementById('push-toggle-btn');
     const setStatus = (txt) => { if (btn) btn.innerText = txt; };
 
-    // 1. Get Service Worker registration (with timeout)
+    // 1. Wait for Service Worker to be ready
     setStatus("Enabling (Readying...)");
     const swReady = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         const detail = window.swStatus ? ` (Status: ${window.swStatus})` : "";
-        reject(new Error('Service Worker took too long to become ready.' + detail + ' Try refreshing.'));
+        reject(new Error('Service Worker took too long to become ready.' + detail));
       }, 10000);
       navigator.serviceWorker.ready.then(reg => {
         clearTimeout(timeout);

@@ -1,3 +1,10 @@
+"""
+app/utils/notifications.py: Web Push Notification Dispatcher
+---------------------------------------------------------
+This module handles all logic for sending PWA push notifications via VAPID.
+It includes support for instant 'New Event' alerts and 'RSVP Deadline' reminders.
+Includes mandatory TTL headers for compatibility with Microsoft Edge (WNS).
+"""
 import json
 from flask import current_app, url_for
 from pywebpush import webpush, WebPushException
@@ -7,7 +14,8 @@ from datetime import datetime, timezone, timedelta
 
 def send_push_to_subscription(subscription, title, body, url=None):
     """
-    Sends a single push notification to a specific device subscription.
+    Dispatches a notification to a specific browser endpoint. 
+    Handles expired subscriptions (410 Gone) by pruning them from the DB.
     """
     try:
         vapid_private_key = current_app.config.get("VAPID_PRIVATE_KEY")
@@ -46,7 +54,8 @@ def send_push_to_subscription(subscription, title, body, url=None):
 
 def send_new_event_notification(event):
     """
-    Notifies all members of a unit when a new event is created.
+    Broadcasts a notification to all unit members when a new event is saved.
+    This is triggered automatically in the 'create_event' admin route.
     """
     # Find all members of the unit who have push subscriptions
     from app.models.unit import UnitMember
@@ -67,8 +76,11 @@ def send_new_event_notification(event):
 
 def send_deadline_reminders(unit_id=None, force=False):
     """
-    Finds events with RSVP deadlines in the next 24-48 hours 
-    and pings members who haven't responded yet.
+    Logic for RSVP reminders.
+    
+    :param unit_id: Filter by unit (optional).
+    :param force: If True, pings all upcoming events (Admin Manual Ping).
+                  If False, only pings events exactly 24h before deadline (Automated).
     """
     now = datetime.now(timezone.utc)
     

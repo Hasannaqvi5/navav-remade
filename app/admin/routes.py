@@ -358,13 +358,16 @@ def create_event(unit_id: str):
             except ValueError:
                 pass
 
-        # Validation: RSVP deadline must be before the event starts
+        # 1. Validation: RSVP deadline must be before the event starts.
+        # This prevents the logical error where users could be asked to respond 
+        # to an event that has already begun or finished.
         if response_due:
             event_start = datetime.combine(event_date, event_time or datetime.min.time())
             if response_due > event_start:
                 flash("RSVP deadline cannot be after the event start time.", "danger")
                 return render_template("admin/create_event.html", unit=unit)
 
+        # 2. Database persistence
         event = Event(
             unit_id=unit_id,
             created_by=current_user.id,
@@ -379,8 +382,10 @@ def create_event(unit_id: str):
         db.session.add(event)
         db.session.commit()
         
-        # Send push notifications to all unit members
+        # 3. Notification Dispatch
+        # Automatically pings all members of the unit via Web Push.
         try:
+            from app.utils.notifications import send_new_event_notification
             send_new_event_notification(event)
         except Exception as e:
             current_app.logger.error(f"Error sending event notifications: {e}")
@@ -441,7 +446,7 @@ def edit_event(unit_id: str, event_id: str):
             except ValueError:
                 pass
 
-        # Validation: RSVP deadline must be before the event starts
+        # Validation: Ensure the RSVP deadline hasn't been moved past the event start.
         if response_due:
             event_start = datetime.combine(event_date, event_time or datetime.min.time())
             if response_due > event_start:
