@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Archive — {{ unit.name }}{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Event Archive</h1>
+      <p class="page-subtitle">Past events for {{ unit.name }}</p>
+    </div>
+    <a href="{{ url_for('admin.events', unit_id=unit.id) }}" class="btn btn-ghost">← Current Events</a>
+  </div>
+
+  {% if grouped %}
+    {% for year, months  in grouped.items() %}
+      <h2 style="margin-top: 2rem; margin-bottom: 1rem;">{{ year }}</h2>
+      {% for month, month_events in months.items() %}
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 1.1rem;">{{ month }}</h3>
+        <div class="card p-0">
+          <ul class="event-list">
+            {% for event in month_events %}
+            <li class="event-list-item">
+              <div class="event-date-badge">
+                <span class="event-month">{{ event.event_date.strftime('%b') }}</span>
+                <span class="event-day">{{ event.event_date.strftime('%d') }}</span>
+              </div>
+              <div class="event-info">
+                <div class="event-name">{{ event.name }}</div>
+                <div class="event-meta">
+                  {{ event.event_date.strftime('%b %d, %Y') }}
+                  {% if event.event_time %} &bull; {{ event | time_range }}{% endif %}
+                  {% if event.location %} &bull; {{ event.location }}{% endif %}
+                </div>
+              </div>
+              <a href="{{ url_for('admin.muster_roll', unit_id=unit.id, event_id=event.id) }}" class="btn btn-primary btn-sm">Attendance Sheet</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🗄️</div>
+      <h2>No past events</h2>
+      <p>Events will appear here automatically once their date has passed.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

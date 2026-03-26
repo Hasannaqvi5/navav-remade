@@ -1,0 +1,64 @@
+{#
+  auth/join.html — Shareable org join link confirmation page.
+
+  Reached by visiting /auth/join/<join_token>.
+  By this point the auth.join_org route has already:
+    1. Looked up the unit by the token
+    2. Confirmed the join link is enabled
+    3. Confirmed the user is authenticated (or redirected them to login first)
+
+  So this page just needs to show the unit name and ask the user to confirm.
+#}
+{% extends "base.html" %}
+{% block title %}Join {{ unit.name }}{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+
+    {# ── Header — show the org they are about to join ─────────────────── #}
+    <div class="auth-header">
+      <div class="auth-icon">⚓</div>
+      {# unit is passed from the route — it's the Unit that owns this join_token #}
+      <h1 class="auth-title">Join {{ unit.name }}</h1>
+      {% if unit.city %}
+        <p class="auth-subtitle">{{ unit.city }}{% if unit.province %}, {{ unit.province }}{% endif %}</p>
+      {% endif %}
+      {% if unit.description %}
+        <p class="auth-subtitle mt-4">{{ unit.description }}</p>
+      {% endif %}
+    </div>
+
+    {# Info blurb explaining what "joining" means #}
+    <div class="info-box">
+      You will be added as a <strong>member</strong> of {{ unit.name }}.
+      Admins can adjust your role from the Organization Settings page.
+    </div>
+
+    {# ── Confirm form ─────────────────────────────────────────────────── #}
+    {#
+      The join_token is in the URL path (not a form field), so we don't
+      need to embed it here. The form only needs the CSRF token.
+      Posting to url_for('auth.join_org', join_token=...) processes the join.
+    #}
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      {# Show who they will be joining as (their current account email) #}
+      <div class="form-group">
+        <label class="form-label">Joining as</label>
+        <input type="text" class="form-input form-input-readonly"
+               value="{{ current_user.email }}" readonly />
+      </div>
+
+      {{ form.submit(class="btn btn-primary btn-block") }}
+    </form>
+
+    {# Cancel link — goes back to the dashboard without joining #}
+    <p class="auth-footer-note">
+      <a href="{{ url_for('index') }}" class="link-subtle">Cancel</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

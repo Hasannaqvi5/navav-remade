@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Join Organization{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-icon">⚓</div>
+      <h1 class="auth-title">Join an Organization</h1>
+      <p class="auth-subtitle">Have a join URL or a code? Paste it below to join your organization.</p>
+    </div>
+    
+    <form method="POST" action="{{ url_for('auth.join_prompt') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      
+      <div class="form-group">
+        <label class="form-label" for="code">Join Code or Link</label>
+        <input class="form-input" type="text" id="code" name="code" required placeholder="e.g. 8fH3k..." />
+      </div>
+      
+      <div class="form-actions mt-4">
+        <button type="submit" class="btn btn-primary btn-block">Join Organization</button>
+      </div>
+    </form>
+    
+    <p class="auth-footer-note">
+      <a href="{{ url_for('index') }}" class="link-subtle">Cancel</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

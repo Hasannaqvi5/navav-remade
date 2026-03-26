@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{{ unit.name }}{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ unit.name }}</h1>
+      {% if unit.city %}<p class="page-subtitle">{{ unit.city }}, {{ unit.province }}</p>{% endif %}
+    </div>
+    <div class="page-actions">
+      <form action="{{ url_for('admin.trigger_reminders', unit_id=unit.id) }}" method="POST" style="display: inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-ghost" title="Send push notifications to members who haven't RSVP'd for upcoming events.">🔔 Ping Reminders</button>
+      </form>
+      <a href="{{ url_for('admin.members', unit_id=unit.id) }}" class="btn btn-primary">👤 Members & Invites</a>
+      <a href="{{ url_for('admin.create_event', unit_id=unit.id) }}" class="btn btn-secondary">+ Create Event</a>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Quick Stats -->
+    <div class="card stats-card">
+      <h2 class="card-title">At a Glance</h2>
+      <div class="stats-grid">
+        <div class="stat-block">
+          <span class="stat-number">{{ members | length }}</span>
+          <span class="stat-label">Members</span>
+        </div>
+        <div class="stat-block">
+          <span class="stat-number">{{ upcoming_events | length }}</span>
+          <span class="stat-label">Upcoming Events</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="card">
+      <div class="card-header-row">
+        <h2 class="card-title">Upcoming Events</h2>
+        <a href="{{ url_for('admin.events', unit_id=unit.id) }}" class="link-subtle">View all</a>
+      </div>
+      {% if upcoming_events %}
+        <ul class="event-list">
+          {% for event in upcoming_events %}
+          <li class="event-list-item">
+            <div class="event-date-badge">
+              <span class="event-month">{{ event.event_date.strftime('%b') }}</span>
+              <span class="event-day">{{ event.event_date.strftime('%d') }}</span>
+            </div>
+            <div class="event-info">
+              <div class="event-name">{{ event.name }}</div>
+              <div class="event-meta">
+                {% if event.event_time %}{{ event | time_range }}{% endif %}
+                {% if event.location %}{% if event.event_time %} &bull; {% endif %}{{ event.location }}{% endif %}
+              </div>
+            </div>
+            <a href="{{ url_for('admin.muster_roll', unit_id=unit.id, event_id=event.id) }}" class="btn btn-ghost btn-sm">Attendance Sheet</a>
+            <a href="{{ url_for('admin.edit_event', unit_id=unit.id, event_id=event.id) }}" class="btn btn-ghost btn-sm">Edit</a>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">No upcoming events. <a href="{{ url_for('admin.create_event', unit_id=unit.id) }}">Create one.</a></p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Quick Links -->
+  <div class="quick-links">
+    <a href="{{ url_for('admin.members', unit_id=unit.id) }}" class="quick-link-card">
+      <span class="quick-link-icon">👤</span> Members
+    </a>
+    <a href="{{ url_for('admin.events', unit_id=unit.id) }}" class="quick-link-card">
+      <span class="quick-link-icon">📅</span> Events
+    </a>
+    <a href="{{ url_for('admin.export_attendance', unit_id=unit.id) }}" class="quick-link-card">
+      <span class="quick-link-icon">📤</span> Export Attendance
+    </a>
+    <a href="{{ url_for('admin.unit_settings', unit_id=unit.id) }}" class="quick-link-card">
+      <span class="quick-link-icon">⚙️</span> Settings
+    </a>
+  </div>
+</div>
+{% endblock %}

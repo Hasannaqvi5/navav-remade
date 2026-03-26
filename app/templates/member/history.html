@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Attendance History{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Attendance History</h1>
+    <p class="page-subtitle">{{ current_user.display_name }}</p>
+  </div>
+
+  <!-- Attendance Summary -->
+  <div class="attendance-summary mb-6">
+    <div class="muster-stat muster-present">
+      <span class="muster-stat-num">{{ present }}</span>
+      <span class="muster-stat-label">Attended Events</span>
+    </div>
+    <div class="muster-stat muster-absent">
+      <span class="muster-stat-num">{{ total - present }}</span>
+      <span class="muster-stat-label">Missed Events</span>
+    </div>
+    <div class="muster-stat">
+      <span class="muster-stat-num">{{ percentage ~ '%' if percentage is not none else 'N/A' }}</span>
+      <span class="muster-stat-label">Attendance Rate</span>
+    </div>
+  </div>
+
+  {% if events %}
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Event</th><th>Date</th><th>My Response</th><th>Actual</th></tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+        {% set rec = records.get(event.id) %}
+        {% set resp = responses.get(event.id) %}
+        <tr>
+          <td class="font-medium">{{ event.name }}</td>
+          <td>{{ event.event_date.strftime('%b %d, %Y') }}</td>
+          <td>
+            {% if resp %}
+              {% if resp.status == 'attending' %}
+                <span class="badge badge-success">Attending</span>
+              {% else %}
+                <span class="badge badge-danger">Not Attending{% if resp.absence_reason %} — {{ resp.absence_reason | title }}{% endif %}</span>
+              {% endif %}
+            {% else %}
+              <span class="badge badge-muted">No Response</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if rec %}
+              {% if rec.was_present %}
+                <span class="badge badge-success">✓ Attended (Verified)</span>
+              {% else %}
+                <span class="badge badge-danger">✗ Absent</span>
+              {% endif %}
+            {% elif event.is_past %}
+              {% if resp and resp.status == 'attending' %}
+                <span class="badge badge-success">✓ Attended (Auto)</span>
+              {% else %}
+                <span class="badge badge-danger">✗ Absent (Auto)</span>
+              {% endif %}
+            {% else %}
+              <span class="badge badge-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📊</div>
+      <h2>No history yet</h2>
+      <p>Your attendance record will appear here after events.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

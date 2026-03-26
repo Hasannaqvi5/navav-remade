@@ -1,0 +1,337 @@
+{#
+  base.html — Master layout template.
+
+  Every page in NavAv extends this file. It provides:
+    - <html> shell with SEO meta tags and font imports
+    - The sticky navbar (NAVAV-style: unit name left, user right)
+    - Flash message toasts (auto-dismissed by main.js)
+    - <main> content area (filled by child templates via {% block content %})
+    - Footer
+    - main.js script tag (+ optional {% block scripts %} for per-page JS)
+
+  Child templates override:
+    {% block title %}   — sets the <title> tag
+    {% block content %} — the page body
+    {% block scripts %} — extra <script> tags
+#}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  {# SEO: child templates can override the title block #}
+  <title>{% block title %}NavAv{% endblock %} — NavAv</title>
+  <meta name="description" content="{% block description %}Attendance tracking for volunteer communities, clubs, and organizations.{% endblock %}" />
+
+  {# Mobile PWA tags #}
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+  {# Google Fonts: Inter (body) + Oswald (headings / military feel) #}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  {# Main design system stylesheet #}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=5" />
+</head>
+<body>
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   NAVBAR
+   Matches NAVAV's compact dark-navy bar:
+     Left:  ⚓ NavAv logo  |  Organization name (with ▾ dropdown indicator)
+     Right: "My Attendance"  |  User name (with ▾)
+   ═══════════════════════════════════════════════════════════════════════════ #}
+<nav class="navbar">
+  <div class="nav-container">
+
+    {# ── Left side ────────────────────────────────────────────────────── #}
+    <div class="nav-left">
+      {# Mobile Back Button - only shown on sub-pages #}
+      {% if request.endpoint not in ['member.dashboard', 'admin.dashboard', 'index', 'auth.login', 'auth.register'] %}
+        {% set home_url = url_for('admin.dashboard') if (request.endpoint and 'admin.' in request.endpoint) else url_for('member.dashboard') %}
+        <button type="button" class="nav-back-button" onclick="window.history.length > 1 ? history.back() : window.location.href='{{ home_url }}'" aria-label="Go Back">
+          <span class="back-icon">←</span>
+        </button>
+      {% endif %}
+
+      {# Logo — always visible, links to the landing page #}
+      <a href="{{ url_for('index') }}" class="nav-brand">
+        <span class="nav-brand-icon">⚓</span>
+        <span class="nav-brand-text">NavAv</span>
+      </a>
+
+      {# Unit selector dropdown — lists all units the user belongs to #}
+      {% if current_user.is_authenticated %}
+        <div class="nav-unit-dropdown" style="margin-left: 0.5rem;">
+          <button type="button" class="nav-unit" id="unitDropdownBtn" aria-haspopup="true" aria-expanded="false" style="border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-family: inherit;">
+            {% if current_user.memberships %}
+              <span>{{ current_user.memberships[0].unit.name }}</span>
+            {% else %}
+              <span>My Organizations</span>
+            {% endif %}
+          </button>
+          
+          <div class="nav-unit-menu" id="unitDropdownMenu">
+            <div class="nav-unit-header">Your Organizations</div>
+            {% if current_user.memberships %}
+              {% for membership in current_user.memberships %}
+                <a href="{{ url_for('member.dashboard') }}" class="nav-unit-item">
+                  {{ membership.unit.name }}
+                </a>
+              {% endfor %}
+              <div class="nav-unit-divider"></div>
+            {% endif %}
+            <a href="{{ url_for('auth.join_prompt') }}" class="nav-unit-item action">🔗 Join Organization</a>
+            <a href="{{ url_for('admin.create_unit') }}" class="nav-unit-item action">+ Create New Organization</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    {# ── Right side ───────────────────────────────────────────────────── #}
+    {% if current_user.is_authenticated %}
+    <div class="nav-right">
+      {# "My Attendance" — takes the member to their personal history #}
+      <a href="{{ url_for('member.history') }}" class="nav-link">My Attendance</a>
+
+      {# Show "Admin" link if the user is an admin of any unit #}
+      {% set is_admin = current_user.memberships | selectattr('role', 'eq', 'admin') | list | length > 0 %}
+      {% if is_admin %}
+        <a href="{{ url_for('admin.dashboard') }}" class="nav-link">Admin</a>
+      {% endif %}
+
+      {# User name / logout dropdown #}
+      <div class="nav-user-dropdown" style="position: relative; display: inline-block; margin-left: 0.5rem;">
+        <button type="button" class="nav-user" id="userMenuBtn" aria-haspopup="true" aria-expanded="false" style="border: none; background: transparent; cursor: pointer; outline: none; font-family: inherit;">
+          {{ current_user.display_name }}
+        </button>
+        <div class="nav-unit-menu" id="userMenuDropdown" style="right: 0; left: auto; min-width: 160px;">
+          <a href="{{ url_for('member.profile') }}" class="nav-unit-item">My Profile</a>
+          <div class="nav-unit-divider"></div>
+          <a href="{{ url_for('auth.logout') }}" class="nav-unit-item" style="color: #dc2626; font-weight: 500;">Log Out</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    {# Guest: show only a Log In link #}
+    <div class="nav-right">
+      <a href="{{ url_for('auth.login') }}" class="nav-link">Log In</a>
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Sign Up</a>
+    </div>
+    {% endif %}
+
+    {# Hamburger — only visible on mobile (CSS hides it on ≥640px) #}
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  {# ── Mobile dropdown menu ─────────────────────────────────────────── #}
+  <div class="nav-mobile" id="navMobile">
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('member.dashboard') }}" class="nav-mobile-link">Dashboard</a>
+      <a href="{{ url_for('member.history') }}"   class="nav-mobile-link">My Attendance</a>
+      
+      {% set is_admin = current_user.memberships | selectattr('role', 'eq', 'admin') | list | length > 0 %}
+      {% if is_admin %}
+        <a href="{{ url_for('admin.dashboard') }}" class="nav-mobile-link">Admin</a>
+      {% endif %}
+
+      <a href="{{ url_for('member.profile') }}"   class="nav-mobile-link">My Profile</a>
+      
+      {# Show organization switcher in mobile menu since it's hidden from the top bar #}
+      {% if current_user.memberships | length > 1 %}
+        {% for membership in current_user.memberships %}
+          <a href="{{ url_for('member.dashboard') }}" class="nav-mobile-link">{{ membership.unit.name }}</a>
+        {% endfor %}
+      {% endif %}
+
+      <div class="nav-unit-divider" style="background: var(--border-light); margin: 1rem 0;"></div>
+      <a href="{{ url_for('auth.logout') }}" class="nav-mobile-link" style="color: #dc2626;">Log Out</a>
+    {% else %}
+      <a href="{{ url_for('auth.login') }}"    class="nav-mobile-link">Log In</a>
+      <a href="{{ url_for('auth.register') }}" class="nav-mobile-link">Sign Up</a>
+    {% endif %}
+  </div>
+</nav>
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   FLASH MESSAGES
+   Flask's flash() queue is consumed here. Categories map to CSS classes:
+     "success" → green left border
+     "danger"  → red left border
+     "warning" → gold left border
+     "info"    → blue left border
+   main.js can auto-dismiss them after a timeout if desired.
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}" role="alert">
+      {{ message }}
+      {# The ✕ button removes just this toast from the DOM #}
+      <button class="flash-close" onclick="this.parentElement.remove()" aria-label="Dismiss">✕</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   MAIN CONTENT
+   Child templates fill this via {% block content %}{% endblock %}.
+   ═══════════════════════════════════════════════════════════════════════════ #}
+<main class="main-content">
+  {% block content %}{% endblock %}
+</main>
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════════════════════ #}
+<footer class="footer">
+  ⚓ NavAv — Attendance & Event Management Platform
+</footer>
+
+{# main.js: handles mobile nav toggle and flash message auto-dismiss #}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{# Service Worker Registration for PWA & Push Notifications #}
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register("/sw.js")
+        .then(function(registration) {
+          window.swStatus = "Registered";
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+          window.swStatus = "Failed: " + err.message;
+          console.error('ServiceWorker registration failed: ', err);
+        });
+    });
+  } else {
+    window.swStatus = "Not Supported by Browser";
+  }
+
+  // Helper to convert VAPID public key to Uint8Array
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
+
+  async function subscribeUser() {
+    try {
+      if (!window.isSecureContext) {
+        throw new Error('This browser requires a secure (HTTPS) connection to enable notifications. Try using Chrome or enabling HTTPS.');
+      }
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      throw new Error('Push messaging is not supported in this browser.');
+    }
+    
+    const btn = document.getElementById('push-toggle-btn');
+    const setStatus = (txt) => { if (btn) btn.innerText = txt; };
+
+    // 1. Get Service Worker registration (with timeout)
+    setStatus("Enabling (Readying...)");
+    const swReady = new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        const detail = window.swStatus ? ` (Status: ${window.swStatus})` : "";
+        reject(new Error('Service Worker took too long to become ready.' + detail + ' Try refreshing.'));
+      }, 10000);
+      navigator.serviceWorker.ready.then(reg => {
+        clearTimeout(timeout);
+        resolve(reg);
+      });
+    });
+
+    const registration = await swReady;
+    setStatus("Enabling (Checking...)");
+    let subscription = await registration.pushManager.getSubscription();
+    
+    // 2. Fetch VAPID Public Key
+    setStatus("Enabling (Keys...)");
+    const vapidResponse = await fetch("{{ url_for('auth.get_vapid_public_key') }}");
+    const vapidPublicKey = await vapidResponse.text();
+    
+    if (!vapidPublicKey || vapidPublicKey.length < 20) {
+      throw new Error('Server returned an invalid VAPID public key.');
+    }
+
+    // 3. Ensure we have a browser subscription
+    if (!subscription) {
+      setStatus("Enabling (Prompting...)");
+      const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: convertedVapidKey
+      });
+    }
+
+    // 4. Sync with server (always do this to ensure DB is up to date)
+    setStatus("Enabling (Saving...)");
+    const saveResponse = await fetch("{{ url_for('auth.subscribe_push') }}", {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-CSRFToken': "{{ csrf_token() }}"
+      },
+      body: JSON.stringify(subscription.toJSON())
+    });
+
+    if (!saveResponse.ok) {
+      const errorData = await saveResponse.json().catch(() => ({}));
+      throw new Error(errorData.error || `Server rejected subscription (${saveResponse.status})`);
+    }
+    
+    return subscription;
+  } catch (err) {
+    console.error("subscribeUser failed:", err);
+    throw err;
+  }
+}
+
+  async function unsubscribeUser() {
+    if (!('serviceWorker' in navigator)) return true;
+    
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    
+    if (subscription) {
+      // 1. Tell server to delete it (with CSRF token)
+      try {
+        await fetch("{{ url_for('auth.unsubscribe_push') }}", {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRFToken': "{{ csrf_token() }}"
+          },
+          body: JSON.stringify({ endpoint: subscription.endpoint })
+        });
+      } catch (e) {
+        console.error("Server unsubscription failed", e);
+      }
+
+      // 2. Unsubscribe in browser
+      await subscription.unsubscribe();
+    }
+    
+    return true;
+  }
+</script>
+
+{# Per-page scripts (e.g. password strength meter on register page) #}
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

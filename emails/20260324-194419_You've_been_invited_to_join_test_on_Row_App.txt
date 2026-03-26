@@ -1,0 +1,8 @@
+TO: ['darrylsbarrels@gmail.com']
+SUBJECT: You've been invited to join test on Row App
+
+
+    <p>You have been invited to join <strong>test</strong> on Row App.</p>
+    <p><a href="http://127.0.0.1:5000/auth/register/invite?token=Ijg3YWQzMjEyLTBkN2MtNDE5ZC05NWEwLTY5ZGQwYjhiMjZlNiI.acMh0w.VJAquOvQJtCMOjGwQN3YdmvTi6Q">Click here to create your account</a></p>
+    <p>This link expires in 48 hours.</p>
+    

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Attendance Sheet — {{ event.name }}{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Attendance Sheet</h1>
+      <p class="page-subtitle">{{ event.name }} — {{ event.event_date.strftime('%B %d, %Y') }}</p>
+    </div>
+    <a href="{{ url_for('admin.events', unit_id=unit.id) }}" class="btn btn-ghost">← Events</a>
+  </div>
+
+  <!-- Summary Bar -->
+  {% set attendees_total = effective_status.values() | select('in', ['present', 'auto_present']) | list | length %}
+  {% set absent_total = effective_status.values() | select('in', ['absent', 'auto_absent']) | list | length %}
+  {% set total_members = members | length %}
+
+  <div class="muster-summary">
+    <div class="muster-stat muster-present">
+      <span class="muster-stat-num">{{ attendees_total }}</span>
+      <span class="muster-stat-label">Attending</span>
+    </div>
+    <div class="muster-stat muster-absent">
+      <span class="muster-stat-num">{{ absent_total }}</span>
+      <span class="muster-stat-label">Absent</span>
+    </div>
+    <div class="muster-stat">
+      <span class="muster-stat-num">{{ total_members }}</span>
+      <span class="muster-stat-label">Total</span>
+    </div>
+  </div>
+
+  <!-- Muster Table -->
+  <div class="table-wrapper">
+    <table class="data-table muster-table">
+      <thead>
+        <tr>
+          <th>Member</th>
+          <th>RSVP</th>
+          <th>Comment</th>
+          <th>Actual Attendance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in members %}
+        {% set resp = responses.get(m.user_id) %}
+        {% set rec = records.get(m.user_id) %}
+        {% set status = effective_status.get(m.user_id) %}
+        
+        <tr class="{{ 'row-present' if status in ['present', 'auto_present'] else 'row-absent' }}">
+          <td>
+            <div class="member-cell">
+              <span class="member-name">{{ m.user.display_name }}</span>
+            </div>
+          </td>
+          <td>
+            {% if resp %}
+              {% if resp.status == 'attending' %}
+                <span class="badge badge-success">✓ Attended</span>
+              {% else %}
+                <span class="badge badge-danger">✗ No</span>
+              {% endif %}
+            {% else %}
+              <span class="badge badge-muted">— None</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if resp and resp.absence_reason %}<span class="text-muted">{{ resp.absence_reason | title }}</span>{% endif %}
+            {% if resp and resp.comment %}<p class="comment-text">{{ resp.comment }}</p>{% endif %}
+          </td>
+          <td>
+            <form method="POST" action="{{ url_for('admin.mark_attendance', unit_id=unit.id, event_id=event.id) }}" class="inline-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="user_id" value="{{ m.user_id }}" />
+              
+              <button type="submit" name="was_present" value="true" 
+                class="btn btn-sm {{ 'btn-primary' if status == 'present' else 'btn-success btn-outline' if status == 'auto_present' else 'btn-ghost' }}">
+                {{ "Present" if status == 'present' else "Auto-Present" if status == 'auto_present' else "Present" }}
+              </button>
+              
+              <button type="submit" name="was_present" value="false" 
+                class="btn btn-sm {{ 'btn-danger' if status == 'absent' else 'btn-danger btn-outline' if status == 'auto_absent' else 'btn-ghost' }}">
+                {{ "Absent" if status == 'absent' else "Auto-Absent" if status == 'auto_absent' else "Absent" }}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

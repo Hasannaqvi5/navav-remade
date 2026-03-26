@@ -1,0 +1,337 @@
+{#
+  admin/settings.html — Unit configuration page.
+
+  Sections:
+    1. Basic info (name, city, province, description)
+    2. Join link (shareable URL) — NEW in Phase 3
+    3. Individual invite link (email-based)
+    4. Twilio SMS settings
+
+  Only the unit admin can see this page (_require_admin enforced in the route).
+#}
+{% extends "base.html" %}
+{% block title %}Settings — {{ unit.name }}{% endblock %}
+
+{% block content %}
+<div class="page-container page-narrow">
+
+  {# Page header #}
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Organization Settings</h1>
+      <p class="page-subtitle">{{ unit.name }}</p>
+    </div>
+    <a href="{{ url_for('admin.unit_detail', unit_id=unit.id) }}" class="btn btn-ghost">← Back</a>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════
+     SECTION 1: Basic unit info
+     ════════════════════════════════════════════════════════════════════════ #}
+  <div class="card">
+    <div class="settings-section">
+      <h2 class="settings-section-title">Basic Information</h2>
+      <form method="POST" action="{{ url_for('admin.unit_settings', unit_id=unit.id) }}">
+
+        {# Flask-WTF CSRF protection — prevents cross-site form submissions #}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <div class="form-group">
+          <label class="form-label" for="name">Organization Name</label>
+          <input class="form-input" id="name" name="name" type="text"
+                 value="{{ unit.name }}" required />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="city">City</label>
+            <input class="form-input" id="city" name="city" type="text"
+                   value="{{ unit.city or '' }}" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="province">Province</label>
+            <input class="form-input" id="province" name="province" type="text"
+                   value="{{ unit.province or '' }}" placeholder="ON" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Description</label>
+          <textarea class="form-input form-textarea" id="description" name="description"
+                    placeholder="Brief description of the organization...">{{ unit.description or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Time Display Format</label>
+          <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="time_format" value="12h" {{ 'checked' if unit.time_format == '12h' else '' }}>
+              <span>12-hour (1:45pm)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="time_format" value="24h" {{ 'checked' if unit.time_format == '24h' else '' }}>
+              <span>24-hour (13:45)</span>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </form>
+
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════
+     SECTION 2: Shareable Join Link (NEW — Phase 3)
+
+     Members can join the unit by visiting this URL in any browser.
+     No per-person invite needed — just share the link.
+
+     The token is a random 64-character string (not a signed JWT) stored in
+     Unit.join_token. Regenerating it instantly invalidates the old URL.
+     ════════════════════════════════════════════════════════════════════════ #}
+  <div class="card">
+    <div class="settings-section">
+      <h2 class="settings-section-title">📎 Shareable Join Link</h2>
+
+      <p class="text-muted mb-4">
+        Anyone with this link can join {{ unit.name }} as a member.
+        Share it in a group chat, email, or signal group — no individual invites needed.
+      </p>
+
+      {% if unit.join_token and unit.join_link_enabled %}
+        {#
+          Build the full absolute join URL.
+          url_for() with _external=True gives us http://domain/auth/join/<token>.
+        #}
+        {% set join_url = url_for('auth.join_org', join_token=unit.join_token, _external=True) %}
+
+        {# Display the link in a monospace box so it's easy to copy #}
+        <div class="join-link-box" id="joinLinkText">{{ join_url }}</div>
+
+        {# Action row: copy button + disable + regenerate #}
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
+
+          {# Copy to clipboard — handled by copyJoinLink() in the scripts block #}
+          <button type="button" class="btn btn-outline btn-sm"
+                  onclick="copyJoinLink()">📋 Copy Link</button>
+
+          {# Disable the link (sets join_link_enabled=False, keeps the token) #}
+          <form method="POST"
+                action="{{ url_for('admin.toggle_join_link', unit_id=unit.id) }}"
+                style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="enable" value="0" />
+            <button type="submit" class="btn btn-ghost btn-sm">Disable Link</button>
+          </form>
+
+          {# Regenerate — creates a new random token, old URL stops working #}
+          <form method="POST"
+                action="{{ url_for('admin.regenerate_join_link', unit_id=unit.id) }}"
+                style="display:inline"
+                onsubmit="return confirm('Regenerate the join link? The old URL will stop working immediately.')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button type="submit" class="btn btn-danger btn-sm">🔄 Regenerate</button>
+          </form>
+        </div>
+
+        <div class="info-box">
+          ⚠️ If you share this link publicly by accident, click <strong>Regenerate</strong> to
+          invalidate the old URL and get a new one.
+        </div>
+
+      {% elif unit.join_token and not unit.join_link_enabled %}
+        {# Token exists but is disabled — show re-enable button #}
+        <div class="info-box">
+          The join link is currently <strong>disabled</strong>.
+          Members cannot join via link until you re-enable it.
+        </div>
+        <form method="POST"
+              action="{{ url_for('admin.toggle_join_link', unit_id=unit.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="hidden" name="enable" value="1" />
+          <button type="submit" class="btn btn-primary btn-sm">Enable Join Link</button>
+        </form>
+
+      {% else %}
+        {# No token yet — first-time setup #}
+        <p class="text-muted mb-4">No join link has been generated yet.</p>
+        <form method="POST"
+              action="{{ url_for('admin.toggle_join_link', unit_id=unit.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="hidden" name="enable" value="1" />
+          <button type="submit" class="btn btn-primary">Generate Join Link</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════
+     SECTION 2.5: Admin Join Link (Phase 8)
+     ════════════════════════════════════════════════════════════════════════ #}
+  <div class="card">
+    <div class="settings-section">
+      <h2 class="settings-section-title">👑 Shareable Admin Join Link</h2>
+
+      <p class="text-muted mb-4">
+        Anyone with this link can join {{ unit.name }} automatically as an <strong>Admin</strong>.
+        Keep this link secure.
+      </p>
+
+      {% if unit.admin_join_token and unit.admin_join_link_enabled %}
+        {% set admin_join_url = url_for('auth.join_org', join_token=unit.admin_join_token, _external=True) %}
+
+        <div class="join-link-box" id="adminJoinLinkText">{{ admin_join_url }}</div>
+
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
+          <button type="button" class="btn btn-outline btn-sm"
+                  onclick="copyAdminJoinLink()">📋 Copy Link</button>
+
+          <form method="POST"
+                action="{{ url_for('admin.toggle_admin_join_link', unit_id=unit.id) }}"
+                style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="enable" value="0" />
+            <button type="submit" class="btn btn-ghost btn-sm">Disable Link</button>
+          </form>
+
+          <form method="POST"
+                action="{{ url_for('admin.regenerate_admin_join_link', unit_id=unit.id) }}"
+                style="display:inline"
+                onsubmit="return confirm('Regenerate the admin join link? The old URL will stop working immediately.')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button type="submit" class="btn btn-danger btn-sm">🔄 Regenerate</button>
+          </form>
+        </div>
+
+      {% elif unit.admin_join_token and not unit.admin_join_link_enabled %}
+        <div class="info-box">
+          The admin join link is currently <strong>disabled</strong>.
+        </div>
+        <form method="POST"
+              action="{{ url_for('admin.toggle_admin_join_link', unit_id=unit.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="hidden" name="enable" value="1" />
+          <button type="submit" class="btn btn-primary btn-sm">Enable Admin Join Link</button>
+        </form>
+
+      {% else %}
+        <p class="text-muted mb-4">No admin join link has been generated yet.</p>
+        <form method="POST"
+              action="{{ url_for('admin.toggle_admin_join_link', unit_id=unit.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="hidden" name="enable" value="1" />
+          <button type="submit" class="btn btn-primary">Generate Admin Join Link</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════
+     SECTION 3: Individual Email Invites
+     ════════════════════════════════════════════════════════════════════════ #}
+  <div class="card">
+    <div class="settings-section">
+      <h2 class="settings-section-title">✉️ Email Invites</h2>
+      <p class="text-muted mb-4">
+        Send invite links to specific people by email address.
+        Each link is single-use and expires after 48 hours.
+      </p>
+      <a href="{{ url_for('admin.invite_member', unit_id=unit.id) }}"
+         class="btn btn-outline">Send Invites →</a>
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════
+     SECTION 4: Twilio SMS (optional)
+     ════════════════════════════════════════════════════════════════════════ #}
+  <div class="card">
+    <div class="settings-section">
+      <h2 class="settings-section-title">📱 SMS Notifications (Twilio)</h2>
+      <p class="text-muted mb-4">
+        Optional: connect a Twilio account to send SMS reminders to members.
+        Leave blank to disable SMS for this organization.
+      </p>
+      <form method="POST" action="{{ url_for('admin.unit_settings', unit_id=unit.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <div class="form-group">
+          <label class="form-label" for="twilio_account_sid">Account SID</label>
+          <input class="form-input" id="twilio_account_sid" name="twilio_account_sid"
+                 type="text" value="{{ unit.twilio_account_sid or '' }}"
+                 placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="twilio_auth_token">Auth Token</label>
+          <input class="form-input" id="twilio_auth_token" name="twilio_auth_token"
+                 type="password" value="{{ unit.twilio_auth_token or '' }}" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="twilio_phone_number">From Number</label>
+          <input class="form-input" id="twilio_phone_number" name="twilio_phone_number"
+                 type="text" value="{{ unit.twilio_phone_number or '' }}"
+                 placeholder="+16135550100" />
+        </div>
+        <button type="submit" class="btn btn-primary">Save SMS Settings</button>
+      </form>
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════
+     SECTION 5: Delete Organization
+     ════════════════════════════════════════════════════════════════════════ #}
+  <div class="card">
+    <div class="settings-section">
+      <h2 class="settings-section-title" style="color: #dc2626;">Delete Organization</h2>
+      <p class="text-muted mb-4">
+        Once you delete an organization, there is no going back. All members, events, and attendance records will be permanently removed.
+      </p>
+      <form action="{{ url_for('admin.delete_unit', unit_id=unit.id) }}" method="POST" 
+            onsubmit="return confirm('⚠️ Are you sure you want to PERMANENTLY delete this organization? This action cannot be undone.')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-outline" style="color: #dc2626; border-color: #dc2626; background: transparent;">Delete {{ unit.name }}</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * Copy the join link URL to the clipboard.
+ * Falls back to selecting the text box if clipboard API is unavailable.
+ */
+function copyJoinLink() {
+  const text = document.getElementById('joinLinkText').textContent.trim();
+  if (navigator.clipboard) {
+    // Modern clipboard API (requires HTTPS in production)
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Join link copied to clipboard!');
+    });
+  } else {
+    // Fallback: select the text so the user can Ctrl+C manually
+    const el = document.getElementById('joinLinkText');
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  }
+}
+
+function copyAdminJoinLink() {
+  const text = document.getElementById('adminJoinLinkText').textContent.trim();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Admin join link copied to clipboard!');
+    });
+  } else {
+    const el = document.getElementById('adminJoinLinkText');
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  }
+}
+</script>
+{% endblock %}

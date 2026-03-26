@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Invite Members — {{ unit.name }}{% endblock %}
+{% block content %}
+<div class="page-container page-narrow">
+  <div class="page-header">
+    <h1 class="page-title">Invite Members</h1>
+    <p class="page-subtitle">{{ unit.name }}</p>
+  </div>
+  <div class="card">
+    <form method="POST" action="{{ url_for('admin.invite_member', unit_id=unit.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <div class="form-group">
+        <label class="form-label" for="emails">Email Addresses <span class="form-hint">(one per line)</span></label>
+        <textarea class="form-input form-textarea" id="emails" name="emails" rows="5" placeholder="jane.smith@example.com&#10;john.doe@example.com" required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="role">Assign Role</label>
+        <select class="form-input form-select" id="role" name="role">
+          <option value="member">Member</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="info-box">
+        📧 Each person will receive an invite link valid for 48 hours.
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Send Invites</button>
+        <a href="{{ url_for('admin.unit_detail', unit_id=unit.id) }}" class="btn btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Admin Dashboard</h1>
+  </div>
+
+  {% if units %}
+    <div class="card-grid">
+      {% for unit in units %}
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">{{ unit.name }}</h2>
+          {% if unit.city %}<span class="card-subtitle">{{ unit.city }}, {{ unit.province }}</span>{% endif %}
+        </div>
+        <div class="card-body">
+          <div class="stat-row">
+            <span class="stat-label">Members</span>
+            <span class="stat-value">{{ unit.members | length }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Events</span>
+            <span class="stat-value">{{ unit.events | length }}</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="{{ url_for('admin.unit_detail', unit_id=unit.id) }}" class="btn btn-secondary btn-sm">Manage</a>
+          <a href="{{ url_for('admin.events', unit_id=unit.id) }}" class="btn btn-ghost btn-sm">Events</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">⚓</div>
+      <h2>No organizations yet</h2>
+      <p>Create your first organization to get started.</p>
+      <a href="{{ url_for('admin.create_unit') }}" class="btn btn-primary">Create an Organization</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

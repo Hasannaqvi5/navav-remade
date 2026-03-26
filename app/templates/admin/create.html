@@ -1,0 +1,47 @@
+{#
+  admin/create.html — Create a new Unit.
+  The first person to create a unit automatically becomes its admin.
+#}
+{% extends "base.html" %}
+{% block title %}Create Organization{% endblock %}
+
+{% block content %}
+<div class="page-container page-narrow">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Create a New Organization</h1>
+      <p class="page-subtitle">Set up a new workspace for your volunteer group, club, or community</p>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn btn-ghost">Cancel</a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('admin.create_unit') }}" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-input", placeholder="e.g. Community Band") }}
+          {% if form.name.errors %}
+            <div class="text-red form-hint mt-1">{{ form.name.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+
+
+        <div class="form-group">
+          {{ form.description.label(class="form-label") }}
+          {{ form.description(class="form-input form-textarea", placeholder="Brief description...") }}
+        </div>
+
+        <div class="form-actions mt-4">
+          <button type="submit" class="btn btn-primary btn-block">Create New Organization</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

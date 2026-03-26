@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}{{ event.name }}{% endblock %}
+{% block content %}
+<div class="page-container page-narrow">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ event.event_date.strftime('%d').lstrip('0') or '0' }} {{ event.event_date.strftime('%b') }} — {{ event.name }}</h1>
+      <p class="page-subtitle">
+        {% if event.event_time %}{{ event | time_range }}{% endif %}
+        {% if event.location %}{% if event.event_time %} &bull; {% endif %}{{ event.location }}{% endif %}
+      </p>
+    </div>
+    <a href="{{ url_for('member.dashboard') }}" class="btn btn-ghost">← Back</a>
+  </div>
+
+  {% if event.response_due_date %}
+  <div class="info-box {{ 'info-box-danger' if event.is_past_deadline else '' }}">
+    {% if event.is_past_deadline %}
+    ⚠️ RSVP Deadline has passed ({{ event.response_due_date | format_dt(unit=event.unit) }})
+    {% else %}
+    ⏰ Responses due <strong>{{ event.response_due_date | format_dt(unit=event.unit) }}</strong>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if event.description %}
+  <div class="card content-card">
+    <h2 class="card-title">Details</h2>
+    <p style="white-space: pre-wrap;">{{ event.description }}</p>
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <h2 class="card-title">Your Response</h2>
+    <form method="POST" action="{{ url_for('member.event_detail', event_id=event.id) }}" id="responseForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <div class="response-toggle">
+        <label class="response-option {{ 'response-selected' if existing and existing.status == ATTENDING }} {{ 'disabled' if event.is_past_deadline else '' }}">
+          <input type="radio" name="status" value="{{ ATTENDING }}" {{ 'checked' if existing and existing.status == ATTENDING }} {{ 'disabled' if event.is_past_deadline else '' }} onchange="toggleAbsenceReason(false)" />
+          <span class="response-icon">✓</span>
+          <span>Attending</span>
+        </label>
+        <label class="response-option {{ 'response-selected' if existing and existing.status == NOT_ATTENDING }} {{ 'disabled' if event.is_past_deadline else '' }}">
+          <input type="radio" name="status" value="{{ NOT_ATTENDING }}" {{ 'checked' if existing and existing.status == NOT_ATTENDING }} {{ 'disabled' if event.is_past_deadline else '' }} onchange="toggleAbsenceReason(true)" />
+          <span class="response-icon">✗</span>
+          <span>Not Attending</span>
+        </label>
+      </div>
+
+      <div id="absenceSection" class="form-group {{ '' if existing and existing.status == NOT_ATTENDING else 'hidden' }}">
+        <label class="form-label" for="absence_reason">Reason for Absence</label>
+        <select class="form-input form-select" id="absence_reason" name="absence_reason" {{ 'disabled' if event.is_past_deadline else '' }}>
+          <option value="">— Select —</option>
+          {% for value, label in absence_reasons %}
+          <option value="{{ value }}" {{ 'selected' if existing and existing.absence_reason == value }}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="comment">Comment <span class="form-hint">(optional)</span></label>
+        <textarea class="form-input form-textarea" id="comment" name="comment" rows="2" maxlength="500" {{ 'disabled' if event.is_past_deadline else '' }}>{{ existing.comment if existing and existing.comment else '' }}</textarea>
+      </div>
+
+      {% if event.is_past_deadline %}
+      <button type="button" class="btn btn-secondary btn-block" disabled>
+        RSVP Closed
+      </button>
+      {% else %}
+      <button type="submit" class="btn btn-primary btn-block">
+        {{ 'Update Response' if existing else 'Submit Response' }}
+      </button>
+      {% endif %}
+    </form>
+  </div>
+
+  {# ── Attendance Lists ─────────────────────────────────────── #}
+  <div class="card">
+    <div class="attendance-lists">
+      <div class="attendance-col">
+        <h3 class="attendance-col-title attending">✓ Attending ({{ attending | length }})</h3>
+        <ul class="attendance-name-list">
+          {% for u in attending %}
+          <li>{{ u.display_name }}</li>
+          {% else %}
+          <li class="text-muted">—</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="attendance-col">
+        <h3 class="attendance-col-title not-attending">✗ Not Attending ({{ not_attending | length }})</h3>
+        <ul class="attendance-name-list">
+          {% for u in not_attending %}
+          <li>{{ u.display_name }}</li>
+          {% else %}
+          <li class="text-muted">—</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="attendance-col">
+        <h3 class="attendance-col-title no-response">○ No Response ({{ no_response | length }})</h3>
+        <ul class="attendance-name-list">
+          {% for u in no_response %}
+          <li>{{ u.display_name }}</li>
+          {% else %}
+          <li class="text-muted">—</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function toggleAbsenceReason(show) {
+  document.getElementById('absenceSection').classList.toggle('hidden', !show);
+}
+document.querySelectorAll('input[name="status"]').forEach(r => {
+  r.addEventListener('change', () => toggleAbsenceReason(r.value === '{{ NOT_ATTENDING }}'));
+});
+</script>
+{% endblock %}

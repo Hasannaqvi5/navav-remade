@@ -1,0 +1,86 @@
+{# auth/login.html — Login page #}
+{#
+  Extends base.html, which provides the <html>, <head>, nav, flash messages,
+  <main>, and <footer>. We only need to fill in the `content` block.
+#}
+{% extends "base.html" %}
+{% block title %}Log In{% endblock %}
+
+{% block content %}
+{# Outer wrapper centres the card vertically and horizontally on the page #}
+<div class="auth-container">
+  <div class="auth-card">
+
+    {# ── Header ──────────────────────────────────────────────────────────── #}
+    <div class="auth-header">
+      <div class="auth-icon">⚓</div>
+      <h1 class="auth-title">NavAv</h1>
+      <p class="auth-subtitle">Attendance & Event Management</p>
+    </div>
+
+    {# ── Login Form ──────────────────────────────────────────────────────── #}
+    {#
+      action="{{ url_for('auth.login') }}" points to the login route.
+      WTForms requires the CSRF token hidden field (form.hidden_tag()) to be
+      inside the <form> — it protects against cross-site request forgery.
+    #}
+    <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm" novalidate>
+      {{ form.hidden_tag() }}
+
+      {# Email field #}
+      <div class="form-group">
+        {{ form.email.label(class="form-label") }}
+        {{ form.email(class="form-input", placeholder="you@example.com", autocomplete="email") }}
+      </div>
+
+      {# Password field with a show/hide toggle button #}
+      <div class="form-group">
+        {{ form.password.label(class="form-label") }}
+        <div class="input-with-toggle">
+          {{ form.password(class="form-input", id="password", placeholder="••••••••", autocomplete="current-password") }}
+          {# Clicking this button switches the input type between "password" and "text" #}
+          <button type="button" class="toggle-pw" aria-label="Show/hide password"
+                  onclick="togglePassword('password', this)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+        </div>
+      </div>
+
+      {# Remember me + forgot password row #}
+      <div class="form-row">
+        <label class="checkbox-label">
+          {{ form.remember() }}
+          <span>Remember me</span>
+        </label>
+        <a href="{{ url_for('auth.forgot_password') }}" class="link-subtle">Forgot password?</a>
+      </div>
+
+      {{ form.submit(class="btn btn-primary btn-block") }}
+    </form>
+
+    <div class="auth-divider">or</div>
+    <p class="auth-footer-note">
+      Don't have an account? <a href="{{ url_for('auth.register') }}">Sign Up</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{# Inline script block — password show/hide helper used on this page #}
+<script>
+/**
+ * Toggle a password input between "show" and "hide" mode.
+ * @param {string} inputId - The id of the <input type="password"> element.
+ * @param {HTMLElement} btn  - The toggle button element (updates its label).
+ */
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';  // Indicate password is now visible
+  } else {
+    input.type = 'password';
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';   // Indicate password is hidden again
+  }
+}
+</script>
+{% endblock %}

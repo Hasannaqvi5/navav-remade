@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Archive{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Event Archive</h1>
+    <a href="{{ url_for('member.dashboard') }}" class="btn btn-ghost">← Dashboard</a>
+  </div>
+
+  {% if grouped %}
+    {% for year, months in grouped.items() %}
+      <h2 style="margin-top: 2rem; margin-bottom: 1rem;">{{ year }}</h2>
+      {% for month, month_events in months.items() %}
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 1.1rem;">{{ month }}</h3>
+        <section class="section">
+          <div class="navav-event-list">
+            {% for event in month_events %}
+            <a href="{{ url_for('member.event_detail', event_id=event.id) }}" class="navav-event-row">
+              <div class="navav-event-status">
+                <span class="navav-status-icon no-response">○</span> 
+              </div>
+              <div class="navav-event-date-col">
+                <span class="navav-event-date-day">{{ event.event_date.strftime('%d').lstrip('0') or '0' }}</span>
+                <span class="navav-event-date-month">{{ event.event_date.strftime('%b') }}</span>
+              </div>
+              <div class="navav-event-info">
+                <span class="navav-event-name">{{ event.name }}</span>
+                <span class="navav-event-due">
+                  {% if event.event_time %}{{ event | time_range }}{% endif %}
+                  {% if event.location %}{% if event.event_time %} &bull; {% endif %}{{ event.location }}{% endif %}
+                </span>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </section>
+      {% endfor %}
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🗄️</div>
+      <h2>No past events</h2>
+      <p>Events will appear here automatically once their date has passed.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
