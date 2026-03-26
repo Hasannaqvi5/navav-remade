@@ -54,7 +54,7 @@
                 {% if event.location %}{% if event.event_time %} &bull; {% endif %}{{ event.location }}{% endif %}
               </div>
             </div>
-            <a href="{{ url_for('admin.muster_roll', unit_id=unit.id, event_id=event.id) }}" class="btn btn-ghost btn-sm">Attendance Sheet</a>
+            <a href="{{ url_for('admin.attendance_sheet', unit_id=unit.id, event_id=event.id) }}" class="btn btn-ghost btn-sm">Attendance Sheet</a>
             <a href="{{ url_for('admin.edit_event', unit_id=unit.id, event_id=event.id) }}" class="btn btn-ghost btn-sm">Edit</a>
           </li>
           {% endfor %}

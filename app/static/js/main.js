@@ -50,7 +50,7 @@ document.querySelectorAll(".flash").forEach((el) => {
   }, 5000);
 });
 
-// ── Response toggle highlight (muster roll) ───────────────────────────────────
+// ── Response toggle highlight (attendance sheet) ──────────────────────────────
 document.querySelectorAll(".response-option").forEach((label) => {
   label.querySelector("input")?.addEventListener("change", () => {
     document.querySelectorAll(".response-option").forEach((l) => l.classList.remove("response-selected"));

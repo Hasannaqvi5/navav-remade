@@ -21,7 +21,7 @@ admin/routes.py — Route handlers for the admin blueprint.
   /admin/unit/<id>/join-link/toggle         — (NEW) enable / disable the join link
   /admin/unit/<id>/events                   — event list
   /admin/unit/<id>/events/create            — create a new event
-  /admin/unit/<id>/events/<eid>/muster      — view attendance sheet
+  /admin/unit/<id>/events/<eid>/attendance  — view attendance sheet
   /admin/unit/<id>/events/<eid>/mark-attendance — record a member's attendance
   /admin/unit/<id>/members                  — member list
   /admin/unit/<id>/settings                 — organization name / city / Twilio settings
@@ -488,11 +488,11 @@ def delete_event(unit_id: str, event_id: str):
     return redirect(url_for("admin.events", unit_id=unit_id))
 
 
-# ── Muster Roll ───────────────────────────────────────────────────────────────
+# ── Attendance Sheet ──────────────────────────────────────────────────────────
 
-@admin.route("/unit/<unit_id>/events/<event_id>/muster")
+@admin.route("/unit/<unit_id>/events/<event_id>/attendance")
 @login_required
-def muster_roll(unit_id: str, event_id: str):
+def attendance_sheet(unit_id: str, event_id: str):
     """
     Display the Attendance Sheet for an event.
     Admins can see who RSVP'd and mark actual attendance.
@@ -522,7 +522,7 @@ def muster_roll(unit_id: str, event_id: str):
             effective_status[m.user_id] = "auto_absent"
 
     return render_template(
-        "admin/muster_roll.html",
+        "admin/attendance_sheet.html",
         unit=unit,
         event=event,
         members=members,
@@ -556,7 +556,7 @@ def mark_attendance(unit_id: str, event_id: str):
         db.session.add(record)
 
     db.session.commit()
-    return redirect(url_for("admin.muster_roll", unit_id=unit_id, event_id=event_id))
+    return redirect(url_for("admin.attendance_sheet", unit_id=unit_id, event_id=event_id))
 
 
 # ── Members ───────────────────────────────────────────────────────────────────

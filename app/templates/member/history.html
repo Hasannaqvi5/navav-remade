@@ -9,17 +9,17 @@
 
   <!-- Attendance Summary -->
   <div class="attendance-summary mb-6">
-    <div class="muster-stat muster-present">
-      <span class="muster-stat-num">{{ present }}</span>
-      <span class="muster-stat-label">Attended Events</span>
+    <div class="attendance-stat attendance-present">
+      <span class="attendance-stat-num">{{ present }}</span>
+      <span class="attendance-stat-label">Attended Events</span>
     </div>
-    <div class="muster-stat muster-absent">
-      <span class="muster-stat-num">{{ total - present }}</span>
-      <span class="muster-stat-label">Missed Events</span>
+    <div class="attendance-stat attendance-absent">
+      <span class="attendance-stat-num">{{ total - present }}</span>
+      <span class="attendance-stat-label">Missed Events</span>
     </div>
-    <div class="muster-stat">
-      <span class="muster-stat-num">{{ percentage ~ '%' if percentage is not none else 'N/A' }}</span>
-      <span class="muster-stat-label">Attendance Rate</span>
+    <div class="attendance-stat">
+      <span class="attendance-stat-num">{{ percentage ~ '%' if percentage is not none else 'N/A' }}</span>
+      <span class="attendance-stat-label">Attendance Rate</span>
     </div>
   </div>
 

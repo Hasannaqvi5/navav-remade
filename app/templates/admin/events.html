@@ -28,7 +28,7 @@
             {% endif %}
           </div>
           <div class="event-actions">
-            <a href="{{ url_for('admin.muster_roll', unit_id=unit.id, event_id=event.id) }}" class="btn btn-primary btn-sm">Attendance Sheet</a>
+            <a href="{{ url_for('admin.attendance_sheet', unit_id=unit.id, event_id=event.id) }}" class="btn btn-primary btn-sm">Attendance Sheet</a>
             <a href="{{ url_for('admin.edit_event', unit_id=unit.id, event_id=event.id) }}" class="btn btn-secondary btn-sm">Edit Event</a>
           </div>
         </li>
@@ -62,7 +62,7 @@
             </div>
           </div>
           <div class="event-actions">
-            <a href="{{ url_for('admin.muster_roll', unit_id=unit.id, event_id=event.id) }}" class="btn btn-primary btn-sm">Edit Attendance</a>
+            <a href="{{ url_for('admin.attendance_sheet', unit_id=unit.id, event_id=event.id) }}" class="btn btn-primary btn-sm">Edit Attendance</a>
           </div>
         </li>
         {% endfor %}

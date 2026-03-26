@@ -23,7 +23,7 @@ RESPONSE_NOT_ATTENDING = "not_attending"
 
 # ── Absence reason constants ─────────────────────────────────────────────
 # Required when status is NOT_ATTENDING. These map to the Naval Reserve's
-# standard absence categories for muster roll exports.
+# standard absence categories for attendance sheet exports.
 ABSENCE_LEAVE = "leave"
 ABSENCE_DUTY = "duty"
 ABSENCE_ILLNESS = "illness"

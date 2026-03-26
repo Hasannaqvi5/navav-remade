@@ -31,7 +31,7 @@
                   {% if event.location %} &bull; {{ event.location }}{% endif %}
                 </div>
               </div>
-              <a href="{{ url_for('admin.muster_roll', unit_id=unit.id, event_id=event.id) }}" class="btn btn-primary btn-sm">Attendance Sheet</a>
+              <a href="{{ url_for('admin.attendance_sheet', unit_id=unit.id, event_id=event.id) }}" class="btn btn-primary btn-sm">Attendance Sheet</a>
             </li>
             {% endfor %}
           </ul>

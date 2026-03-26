@@ -15,24 +15,24 @@
   {% set absent_total = effective_status.values() | select('in', ['absent', 'auto_absent']) | list | length %}
   {% set total_members = members | length %}
 
-  <div class="muster-summary">
-    <div class="muster-stat muster-present">
-      <span class="muster-stat-num">{{ attendees_total }}</span>
-      <span class="muster-stat-label">Attending</span>
+  <div class="attendance-summary">
+    <div class="attendance-stat attendance-present">
+      <span class="attendance-stat-num">{{ attendees_total }}</span>
+      <span class="attendance-stat-label">Attending</span>
     </div>
-    <div class="muster-stat muster-absent">
-      <span class="muster-stat-num">{{ absent_total }}</span>
-      <span class="muster-stat-label">Absent</span>
+    <div class="attendance-stat attendance-absent">
+      <span class="attendance-stat-num">{{ absent_total }}</span>
+      <span class="attendance-stat-label">Absent</span>
     </div>
-    <div class="muster-stat">
-      <span class="muster-stat-num">{{ total_members }}</span>
-      <span class="muster-stat-label">Total</span>
+    <div class="attendance-stat">
+      <span class="attendance-stat-num">{{ total_members }}</span>
+      <span class="attendance-stat-label">Total</span>
     </div>
   </div>
 
-  <!-- Muster Table -->
+  <!-- Attendance Table -->
   <div class="table-wrapper">
-    <table class="data-table muster-table">
+    <table class="data-table attendance-table">
       <thead>
         <tr>
           <th>Member</th>
