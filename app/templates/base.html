@@ -43,7 +43,7 @@
 {# ═══════════════════════════════════════════════════════════════════════════
    NAVBAR
    Matches NAVAV's compact dark-navy bar:
-     Left:  ⚓ NavAv logo  |  Organization name (with ▾ dropdown indicator)
+     Left: # NavAv logo  |  Organization name (with ▾ dropdown indicator)
      Right: "My Attendance"  |  User name (with ▾)
    ═══════════════════════════════════════════════════════════════════════════ #}
 <nav class="navbar">
@@ -61,7 +61,6 @@
 
       {# Logo — always visible, links to the landing page #}
       <a href="{{ url_for('index') }}" class="nav-brand">
-        <span class="nav-brand-icon">⚓</span>
         <span class="nav-brand-text">NavAv</span>
       </a>
 
@@ -195,7 +194,7 @@
    FOOTER
    ═══════════════════════════════════════════════════════════════════════════ #}
 <footer class="footer">
-  ⚓ NavAv — Attendance & Event Management Platform
+  NavAv — Attendance & Event Management Platform
 </footer>
 
 {# main.js: handles mobile nav toggle and flash message auto-dismiss #}

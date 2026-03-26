@@ -16,8 +16,13 @@ class Config:
 
     # ── Database ──────────────────────────────────────────────────────────────
     _db_url = os.environ.get("DATABASE_URL")
+    # Render/Heroku provide 'postgres://', but SQLAlchemy requires 'postgresql://'
     if _db_url and _db_url.startswith("postgres://"):
         _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+    
+    # If using Postgres on Render, we might need to enforce SSL
+    if _db_url and "postgresql" in _db_url and "sslmode" not in _db_url:
+        _db_url += ("&" if "?" in _db_url else "?") + "sslmode=require"
     
     SQLALCHEMY_DATABASE_URI = _db_url or "sqlite:///navav.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False

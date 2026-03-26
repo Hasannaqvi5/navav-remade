@@ -17,7 +17,7 @@
 
     {# ── Header ────────────────────────────────────────────────────────── #}
     <div class="auth-header">
-      <div class="auth-icon">⚓</div>
+      <div class="auth-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail-plus"><path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h9"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><path d="M19 16v6"/><path d="M16 19h6"/></svg></div>
       {# invite.unit is loaded via the SQLAlchemy relationship on Invite #}
       <h1 class="auth-title">Join {{ invite.unit.name }}</h1>
       <p class="auth-subtitle">Complete your account to accept this invite</p>
