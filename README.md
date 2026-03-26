@@ -2,7 +2,7 @@
 
 **Modern attendance tracking for organizational efficiency.**
 
-NavAv is a sleek, mobile-first PWA designed to replace legacy attendance systems with a modernized UI, real-time push notifications, and automated RSVP reminders.
+**Live Demo**: [navav-remade.onrender.com](https://navav-remade.onrender.com)
 
 ---
 
