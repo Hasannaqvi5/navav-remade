@@ -3,6 +3,12 @@ from app import create_app
 
 app = create_app(os.environ.get("FLASK_ENV", "development"))
 
+# Add this to automatically create tables on the live database (Render) 
+# if they don't exist. This is safe to run every time.
+with app.app_context():
+    from app.extensions import db
+    db.create_all()
+
 if __name__ == "__main__":
     # To test HTTPS locally (required for PWA Push on mobile):
     # 1. pip install pyopenssl
