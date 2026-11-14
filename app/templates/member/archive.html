@@ -13,19 +13,19 @@
       {% for month, month_events in months.items() %}
         <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 1.1rem;">{{ month }}</h3>
         <section class="section">
-          <div class="navav-event-list">
+          <div class="muster-event-list">
             {% for event in month_events %}
-            <a href="{{ url_for('member.event_detail', event_id=event.id) }}" class="navav-event-row">
-              <div class="navav-event-status">
-                <span class="navav-status-icon no-response">○</span> 
+            <a href="{{ url_for('member.event_detail', event_id=event.id) }}" class="muster-event-row">
+              <div class="muster-event-status">
+                <span class="muster-status-icon no-response">○</span> 
               </div>
-              <div class="navav-event-date-col">
-                <span class="navav-event-date-day">{{ event.event_date.strftime('%d').lstrip('0') or '0' }}</span>
-                <span class="navav-event-date-month">{{ event.event_date.strftime('%b') }}</span>
+              <div class="muster-event-date-col">
+                <span class="muster-event-date-day">{{ event.event_date.strftime('%d').lstrip('0') or '0' }}</span>
+                <span class="muster-event-date-month">{{ event.event_date.strftime('%b') }}</span>
               </div>
-              <div class="navav-event-info">
-                <span class="navav-event-name">{{ event.name }}</span>
-                <span class="navav-event-due">
+              <div class="muster-event-info">
+                <span class="muster-event-name">{{ event.name }}</span>
+                <span class="muster-event-due">
                   {% if event.event_time %}{{ event | time_range }}{% endif %}
                   {% if event.location %}{% if event.event_time %} &bull; {% endif %}{{ event.location }}{% endif %}
                 </span>

@@ -34,6 +34,6 @@ def send_event_reminder_sms(unit, user, event) -> bool:
     body = (
         f"[{unit.name}] Reminder: {event.name} is on "
         f"{event.event_date.strftime('%b %d')}. "
-        f"Please log in to NavAv to submit your response."
+        f"Please log in to Muster to submit your response."
     )
     return send_sms(unit, user.phone_number, body)

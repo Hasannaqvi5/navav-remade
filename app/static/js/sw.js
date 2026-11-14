@@ -1,4 +1,4 @@
-// ── NavAv Service Worker ────────────────────────────────────────────────────────
+// ── Muster Service Worker ────────────────────────────────────────────────────────
 // This script runs in the background, even when the web app is closed.
 // It is responsible for listening for 'push' events from the server and
 // displaying them as system-level notifications.
@@ -25,7 +25,7 @@ self.addEventListener('push', function(event) {
 
     // 3. Keep the service worker alive until the notification is shown
     event.waitUntil(
-      self.registration.showNotification(data.title || 'NavAv Alert', options)
+      self.registration.showNotification(data.title || 'Muster Alert', options)
     );
   }
 });

@@ -1,5 +1,5 @@
 """
-app/__init__.py — Application factory for NavAv.
+app/__init__.py — Application factory for Muster.
 
 Using the application factory pattern (create_app) instead of a module-level
 Flask instance allows us to:
@@ -71,7 +71,7 @@ def create_app(config_name: str = "default") -> Flask:
         Landing page redirect.
         If a logged-in user is authenticated, bounce them to their dashboard
         (where they can see their unit, or create/join a unit).
-        Otherwise redirect to the login page like NAVAV.
+        Otherwise redirect to the login page.
         """
         if current_user.is_authenticated:
             return redirect(url_for("member.dashboard"))

@@ -1,7 +1,7 @@
 /*
- * main.css — Row App design system
+ * main.css — Muster design system
  *
- * Inspired by NAVAV's clean, light aesthetic:
+ * Clean, light aesthetic:
  *   - Background: light blue-grey (not blinding white, not dark)
  *   - Cards:       pure white, thin border, minimal shadow
  *   - Navbar:      dark navy, compact, unit name left / user right
@@ -18,7 +18,7 @@
  *   7. Buttons
  *   8. Forms (inputs, labels, password toggle, strength bar)
  *   9. Auth pages
- *  10. Event list (NAVAV-style rows)
+ *  10. Event list (Muster-style rows)
  *  11. Dashboard grid and stat blocks
  *  12. Attendance Table
  *  13. Badges
@@ -37,7 +37,7 @@
 
 :root {
   /* Core palette */
-  --bg:          #e8eef4;   /* Page background — light blue-grey like NAVAV */
+  --bg:          #e8eef4;   /* Page background — light blue-grey */
   --bg-white:    #ffffff;   /* Card / input background */
   --navy:        #0d1b2e;   /* Navbar, dark headings */
   --navy-mid:    #162540;   /* Navbar hover states */
@@ -62,7 +62,7 @@
   --radius:      10px;
   --radius-lg:   14px;
 
-  /* Shadows — very subtle, like NAVAV */
+  /* Shadows — very subtle */
   --shadow-card: 0 1px 3px rgba(0,0,0,.08), 0 0 0 1px var(--border);
   --shadow-lg:   0 4px 20px rgba(0,0,0,.10);
 
@@ -126,7 +126,7 @@ p { color: var(--text); }
 
 /* ══════════════════════════════════════════════════════════════════════════════
    3. NAVBAR
-   NAVAV style: dark navy bar, unit name + dropdown arrow on left,
+   Muster style: dark navy bar, unit name + dropdown arrow on left,
    "My Attendance" link and user name dropdown on right.
    ══════════════════════════════════════════════════════════════════════════════ */
 .navbar {
@@ -250,7 +250,7 @@ p { color: var(--text); }
 }
 .nav-brand:hover { color: #fff; text-decoration: none; }
 .nav-brand-icon { font-size: 1.2rem; }
-/* The "Row App" or org name shown in the navbar */
+/* The "Muster" or org name shown in the navbar */
 .nav-brand-text {
   font-family: 'Oswald', sans-serif;
   font-size: 1.1rem;
@@ -366,7 +366,7 @@ p { color: var(--text); }
   text-decoration: none;
 }
 
-/* User name button — like NAVAV's "Hasan Naqvi" right-side dropdown */
+/* User name button — "Hasan Naqvi" style right-side dropdown */
 .nav-user {
   display: flex;
   align-items: center;
@@ -546,7 +546,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 
 /* ══════════════════════════════════════════════════════════════════════════════
    6. CARDS
-   White card with thin border and very light shadow — the NAVAV event row style.
+   White card with thin border and very light shadow — the Muster event row style.
    ══════════════════════════════════════════════════════════════════════════════ */
 .card {
   background: var(--bg-white);
@@ -590,7 +590,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 }
 .btn:hover { text-decoration: none; }
 
-/* Primary: solid blue (NAVAV's main action colour) */
+/* Primary: solid blue (main action colour) */
 .btn-primary {
   background: var(--blue);
   color: #fff;
@@ -810,7 +810,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   10. EVENT LIST — NAVAV STYLE
+   10. EVENT LIST — MUSTER STYLE
    Each row is a white card with a coloured status icon on the left,
    date + bold title, and a blue "Due on..." line below.
    ══════════════════════════════════════════════════════════════════════════════ */
@@ -859,7 +859,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 
 .event-row-body { flex: 1; min-width: 0; }
 .event-row-title { font-weight: 700; font-size: 0.95rem; color: var(--navy); }
-/* "Due this Friday" / "Due on Apr 9" — blue like NAVAV */
+/* "Due this Friday" / "Due on Apr 9" — blue */
 .event-row-due { font-size: 0.8rem; color: var(--blue); margin-top: 0.1rem; }
 
 .event-row-actions { flex-shrink: 0; }
@@ -1069,9 +1069,9 @@ hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   16. NAVAV-STYLE EVENT LIST (dashboard)
+   16. MUSTER-STYLE EVENT LIST (dashboard)
    ══════════════════════════════════════════════════════════════════════════════ */
-.navav-event-list {
+.muster-event-list {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -1081,7 +1081,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
   overflow: hidden;
 }
 
-.navav-event-row {
+.muster-event-row {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -1091,18 +1091,18 @@ hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
   color: var(--text);
   transition: background var(--ease);
 }
-.navav-event-row:last-child { border-bottom: none; }
-.navav-event-row:hover { background: var(--bg); text-decoration: none; }
+.muster-event-row:last-child { border-bottom: none; }
+.muster-event-row:hover { background: var(--bg); text-decoration: none; }
 
 /* Status icon column */
-.navav-event-status {
+.muster-event-status {
   flex-shrink: 0;
   width: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.navav-status-icon {
+.muster-status-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1113,29 +1113,29 @@ hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
   font-weight: 700;
   border: 2px solid;
 }
-.navav-status-icon.attending      { color: #16a34a; border-color: #16a34a; }
-.navav-status-icon.not-attending  { color: #dc2626; border-color: #dc2626; }
-.navav-status-icon.no-response    { color: #b45309; border-color: #d97706; }
+.muster-status-icon.attending      { color: #16a34a; border-color: #16a34a; }
+.muster-status-icon.not-attending  { color: #dc2626; border-color: #dc2626; }
+.muster-status-icon.no-response    { color: #b45309; border-color: #d97706; }
 
 /* Date column */
-.navav-event-date-col {
+.muster-event-date-col {
   flex-shrink: 0;
   width: 2.75rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
-.navav-event-date-day   { font-size: 1.1rem; font-weight: 700; line-height: 1; }
-.navav-event-date-month { font-size: 0.725rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: .05em; }
+.muster-event-date-day   { font-size: 1.1rem; font-weight: 700; line-height: 1; }
+.muster-event-date-month { font-size: 0.725rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: .05em; }
 
 /* Info column */
-.navav-event-info {
+.muster-event-info {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-.navav-event-name { font-weight: 600; font-size: 0.95rem; }
-.navav-event-due  { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.1rem; }
+.muster-event-name { font-weight: 600; font-size: 0.95rem; }
+.muster-event-due  { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.1rem; }
 
 /* ══════════════════════════════════════════════════════════════════════════════
    17. EVENT DETAIL ATTENDANCE LISTS

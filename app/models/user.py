@@ -7,7 +7,7 @@ from app.extensions import db, login_manager
 
 class User(UserMixin, db.Model):
     """
-    Represents a person with a NavAv account.
+    Represents a person with a Muster account.
 
     Inherits from UserMixin, which provides default implementations for the
     is_authenticated, is_active, is_anonymous, and get_id() methods that
