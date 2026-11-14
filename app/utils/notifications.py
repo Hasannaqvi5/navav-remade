@@ -20,7 +20,7 @@ def send_push_to_subscription(subscription, title, body, url=None):
     try:
         vapid_private_key = current_app.config.get("VAPID_PRIVATE_KEY")
         vapid_claims = {
-            "sub": f"mailto:{current_app.config.get('VAPID_ADMIN_EMAIL', 'admin@navav.app')}"
+            "sub": f"mailto:{current_app.config.get('VAPID_ADMIN_EMAIL', 'admin@muster.app')}"
         }
 
         webpush(

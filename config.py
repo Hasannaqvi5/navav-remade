@@ -7,7 +7,7 @@ load_dotenv()
 class Config:
     """Base configuration."""
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
-    APP_NAME = os.environ.get("APP_NAME", "NavAv")
+    APP_NAME = os.environ.get("APP_NAME", "Muster")
 
     # Flask-WTF CSRF protection — uses SECRET_KEY to sign CSRF tokens.
     # Always True; to disable in tests use app.config["WTF_CSRF_ENABLED"] = False.
@@ -24,7 +24,7 @@ class Config:
     if _db_url and "postgresql" in _db_url and "sslmode" not in _db_url:
         _db_url += ("&" if "?" in _db_url else "?") + "sslmode=require"
     
-    SQLALCHEMY_DATABASE_URI = _db_url or "sqlite:///navav.db"
+    SQLALCHEMY_DATABASE_URI = _db_url or "sqlite:///muster.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # ── Mail ─────────────────────────────────────────────────────────────────

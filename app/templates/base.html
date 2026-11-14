@@ -1,9 +1,9 @@
 {#
   base.html — Master layout template.
 
-  Every page in NavAv extends this file. It provides:
+  Every page in Muster extends this file. It provides:
     - <html> shell with SEO meta tags and font imports
-    - The sticky navbar (NAVAV-style: unit name left, user right)
+    - The sticky navbar (Muster-style: unit name left, user right)
     - Flash message toasts (auto-dismissed by main.js)
     - <main> content area (filled by child templates via {% block content %})
     - Footer
@@ -21,7 +21,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   {# SEO: child templates can override the title block #}
-  <title>{% block title %}NavAv{% endblock %} — NavAv</title>
+  <title>{% block title %}Muster{% endblock %} — Muster</title>
   <meta name="description" content="{% block description %}Attendance tracking for volunteer communities, clubs, and organizations.{% endblock %}" />
 
   {# Mobile PWA tags #}
@@ -44,8 +44,8 @@
 
 {# ═══════════════════════════════════════════════════════════════════════════
    NAVBAR
-   Matches NAVAV's compact dark-navy bar:
-     Left: # NavAv logo  |  Organization name (with ▾ dropdown indicator)
+   Compact dark-navy bar:
+     Left: # Muster logo  |  Organization name (with ▾ dropdown indicator)
      Right: "My Attendance"  |  User name (with ▾)
    ═══════════════════════════════════════════════════════════════════════════ #}
 <nav class="navbar">
@@ -63,7 +63,7 @@
 
       {# Logo — always visible, links to the landing page #}
       <a href="{{ url_for('index') }}" class="nav-brand">
-        <span class="nav-brand-text">NavAv</span>
+        <span class="nav-brand-text">Muster</span>
       </a>
 
       {# Unit selector dropdown — lists all units the user belongs to #}
@@ -196,7 +196,7 @@
    FOOTER
    ═══════════════════════════════════════════════════════════════════════════ #}
 <footer class="footer">
-  NavAv — Attendance & Event Management Platform
+  Muster — Attendance & Event Management Platform
 </footer>
 
 {# main.js: handles mobile nav toggle and flash message auto-dismiss #}

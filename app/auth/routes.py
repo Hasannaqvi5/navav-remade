@@ -1,7 +1,7 @@
 """
 auth/routes.py — Route handlers for the authentication blueprint.
 
-━━━ Authentication flows in NavAv ━━━
+━━━ Authentication flows in Muster ━━━
 
   1. OPEN REGISTRATION  (/auth/register)
      Anyone can create an account with just email + name + password.
@@ -175,7 +175,7 @@ def register():
         # Log the user in immediately after account creation
         login_user(user)
         send_welcome_email(user)
-        flash("Welcome to NavAv! Create or join an organization to get started.", "success")
+        flash("Welcome to Muster! Create or join an organization to get started.", "success")
         return redirect(url_for("index"))
 
     return render_template("auth/register.html", form=form)

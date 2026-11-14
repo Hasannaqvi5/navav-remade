@@ -1,4 +1,4 @@
-# NavAv
+# Muster
 
 **Modern attendance tracking for organizational efficiency.**
 
@@ -41,14 +41,14 @@ python run.py
 ## Project Structure
 
 ```
-navav-remade/
+muster/
 ├── app/
 │   ├── models/          # Database schemas
 │   ├── auth/            # Login, Registration & Push Handshake
 │   ├── admin/           # Unit Management & Event Controls
 │   ├── member/          # User Dashboard & RSVP Logic
 │   ├── static/          # Modernized CSS & PWA Service Worker
-│   └── templates/       # Redesigned NavAv Templates
+│   └── templates/       # Redesigned Muster Templates
 ├── config.py            # Global Application Settings
 ├── run.py               # Entry Point
 └── requirements.txt

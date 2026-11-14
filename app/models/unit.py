@@ -33,7 +33,7 @@ class Unit(db.Model):
     """
     An organization (e.g. Community Club, Volunteer Group).
 
-    Created by the first admin who sets it up on NavAv.
+    Created by the first admin who sets it up on Muster.
     Other users join it either via:
       1. A shareable join link  (/auth/join/<join_token>)
       2. An individual email invite (/auth/register/invite?token=...)

@@ -8,33 +8,33 @@
 
   {% if upcoming %}
   <section class="section">
-    <div class="navav-event-list">
+    <div class="muster-event-list">
       {% for event in upcoming %}
       {% set resp = responses.get(event.id) %}
-      <a href="{{ url_for('member.event_detail', event_id=event.id) }}" class="navav-event-row">
-        <div class="navav-event-status">
+      <a href="{{ url_for('member.event_detail', event_id=event.id) }}" class="muster-event-row">
+        <div class="muster-event-status">
           {% if resp %}
             {% if resp.status == 'attending' %}
-              <span class="navav-status-icon attending">✓</span>
+              <span class="muster-status-icon attending">✓</span>
             {% else %}
-              <span class="navav-status-icon not-attending">✗</span>
+              <span class="muster-status-icon not-attending">✗</span>
             {% endif %}
           {% else %}
-            <span class="navav-status-icon no-response">○</span>
+            <span class="muster-status-icon no-response">○</span>
           {% endif %}
         </div>
-        <div class="navav-event-date-col">
-          <span class="navav-event-date-day">{{ event.event_date.strftime('%d').lstrip('0') or '0' }}</span>
-          <span class="navav-event-date-month">{{ event.event_date.strftime('%b') }}</span>
+        <div class="muster-event-date-col">
+          <span class="muster-event-date-day">{{ event.event_date.strftime('%d').lstrip('0') or '0' }}</span>
+          <span class="muster-event-date-month">{{ event.event_date.strftime('%b') }}</span>
         </div>
-        <div class="navav-event-info">
-          <span class="navav-event-name">{{ event.name }}</span>
-          <span class="navav-event-due">
+        <div class="muster-event-info">
+          <span class="muster-event-name">{{ event.name }}</span>
+          <span class="muster-event-due">
             {% if event.event_time %}{{ event | time_range }}{% endif %}
             {% if event.location %}{% if event.event_time %} &bull; {% endif %}{{ event.location }}{% endif %}
           </span>
           {% if event.response_due_date %}
-          <span class="navav-event-due" style="display: block; margin-top: 2px;">Due {{ event.response_due_date.strftime('%d').lstrip('0') or '0' }} {{ event.response_due_date.strftime('%b') }}</span>
+          <span class="muster-event-due" style="display: block; margin-top: 2px;">Due {{ event.response_due_date.strftime('%d').lstrip('0') or '0' }} {{ event.response_due_date.strftime('%b') }}</span>
           {% endif %}
         </div>
       </a>
